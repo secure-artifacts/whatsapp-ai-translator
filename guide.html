@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>文/A AI Translator - 本地配置指南</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #111b21;
+      color: #e9edef;
+      line-height: 1.6;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 800px;
+      background: #202c33;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    h1 { color: #00a884; text-align: center; margin-bottom: 20px; }
+    h2 { color: #00ffff; border-bottom: 1px solid #2a3942; padding-bottom: 10px; margin-top: 40px; }
+    p { font-size: 15px; color: #d1d7db; }
+    .step {
+      background: #2a3942;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid #00a884;
+    }
+    code {
+      background: #111b21;
+      color: #00e676;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 16px;
+    }
+    .btn {
+      display: inline-block;
+      background: #00a884;
+      color: #111b21;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 20px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .btn:hover { background: #00e676; }
+    .alert {
+      background: rgba(255, 82, 82, 0.1);
+      border: 1px solid #ff5252;
+      color: #ff5252;
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    img { max-width: 100%; border-radius: 8px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 30px;">
+      <img src="icon128.png" style="width: 72px; height: 72px; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); display: inline-block;" alt="Logo">
+      <h1 style="color: #00a884; margin-top: 15px; margin-bottom: 5px;">WhatsApp AI Translator Pro</h1>
+      <p style="color: #8696a0; margin: 0; font-size: 14px;">小白免踩坑 · 本地 AI (Ollama) 极速部署指南</p>
+    </div>
+    
+    <p>为了让您的聊天记录绝不泄露，且永久免费使用顶级 AI，本插件默认连接您电脑本地的 AI 大模型。请按照以下 4 步完成配置（仅需一次）。</p>
+
+    <div class="step">
+      <h2>第一步：下载并安装 Ollama</h2>
+      <p>Ollama 是目前最强大的本地 AI 运行工具。点击下方按钮前往官网下载，并像安装普通软件一样把它安装到您的电脑上。</p>
+      <a href="https://ollama.com/download" target="_blank" class="btn">前往官网下载 Ollama</a>
+    </div>
+
+    <div class="step">
+      <h2>第二步：下载 Llama 3.1 翻译模型</h2>
+      <p>安装完 Ollama 后，打开您的电脑终端（Windows 用户请按 <code>Win + R</code> 键，输入 <code>cmd</code> 后回车）。</p>
+      <p>在弹出的黑框框里，复制并粘贴下面这行命令，然后敲回车：</p>
+      <p><code>ollama run llama3.1</code></p>
+      <p>此时电脑会自动下载目前最聪明的 Llama 3.1 模型（约 4.7GB）。等待进度条达到 100% 即可。</p>
+    </div>
+
+    <div class="step">
+      <h2>第三步：核心秘籍 - 配置环境变量 (解决无法连接)</h2>
+      <p>出于安全原因，Ollama 默认不允许浏览器插件直接连接它。我们必须给电脑添加一个“通行证”。</p>
+      <ol>
+        <li>点击 Windows 左下角开始菜单，搜索 <strong>“环境变量”</strong>（或 "Environment Variables"）。</li>
+        <li>点击 <strong>“编辑系统环境变量”</strong>，在弹出的窗口右下角点击 <strong>“环境变量”</strong> 按钮。</li>
+        <li>在上方“用户变量”区域，点击 <strong>“新建”</strong> 按钮。</li>
+        <li>变量名输入：<code>OLLAMA_ORIGINS</code></li>
+        <li>变量值输入：<code>*</code> （就是一个星号）</li>
+        <li>一路点击“确定”保存所有窗口。</li>
+      </ol>
+    </div>
+
+    <div class="step alert">
+      <h2>第四步：终极一步 - 重启电脑！</h2>
+      <p>⚠️ 警告：设置完环境变量后，如果不重启电脑，Ollama 是不会读取新设置的通行证的！</p>
+      <p>请立刻 <strong>重启您的电脑</strong>。重启后，保持 Ollama 软件在后台运行，您的 WhatsApp 翻译插件就可以完美工作了！</p>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <p style="color:#888; font-size: 13px;">配置完成后，您可以直接关闭此页面。</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>文/A AI Translator</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 15px;">
+    <img src="icon48.png" style="width: 28px; height: 28px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" alt="Logo">
+    <span class="title" style="font-size: 18px; font-weight: bold; color: #111b21;">WhatsApp AI Translator</span>
+  </div>
+
+  <!-- 新手指南入口 -->
+  <button id="open-guide" class="btn primary-btn" style="background-color: #ff9800; border-color: #ff9800; margin-bottom: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px;">
+    📖 新手必看：本地 AI 免费配置教程
+  </button>
+
+  <div class="form-group">
+    <label>默认目标语言 (Target Language):</label>
+    <select id="target-lang">
+      <option value="English">英语 (English)</option>
+      <option value="Chinese">中文 (Chinese)</option>
+      <option value="Portuguese">葡萄牙语 (Portuguese)</option>
+      <option value="Spanish">西班牙语 (Spanish)</option>
+      <option value="French">法语 (French)</option>
+      <option value="German">德语 (German)</option>
+      <option value="Russian">俄语 (Russian)</option>
+      <option value="Japanese">日语 (Japanese)</option>
+      <option value="Korean">韩语 (Korean)</option>
+      <option value="Arabic">阿拉伯语 (Arabic)</option>
+      <option value="Hindi">印地语 (Hindi)</option>
+      <option value="Indonesian">印尼语 (Indonesian)</option>
+      <option value="Vietnamese">越南语 (Vietnamese)</option>
+      <option value="Thai">泰语 (Thai)</option>
+      <option value="Malay">马来语 (Malay)</option>
+      <option value="Italian">意大利语 (Italian)</option>
+      <option value="Dutch">荷兰语 (Dutch)</option>
+      <option value="Turkish">土耳其语 (Turkish)</option>
+      <option value="Polish">波兰语 (Polish)</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Groq API Key <span style="font-size:11px; color:#888;">(专门用于语音转文字)</span>:</label>
+    <input type="text" id="groq-key" placeholder="在此输入 gsk_ 开头的密钥，留空则语音翻译不可用" />
+  </div>
+
+  <div class="form-group toggle-group" style="display: flex; align-items: center; justify-content: space-between;">
+    <label style="margin-bottom: 0;">智能附加 Emoji 表情</label>
+    <label class="switch">
+      <input type="checkbox" id="use-emoji">
+      <span class="slider round"></span>
+    </label>
+  </div>
+
+  <!-- 高级设置切换按钮 -->
+  <div style="text-align: center; margin: 20px 0 10px 0;">
+    <a href="#" id="toggle-advanced" style="color: #00a884; font-size: 13px; text-decoration: none; border-bottom: 1px dashed #00a884; padding-bottom: 2px;">⚙️ 展开高级设置 (用于切换云端中转 API)</a>
+  </div>
+
+  <!-- 默认折叠的高级设置 (API配置) -->
+  <div id="advanced-settings" style="display: none; padding: 15px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; border: 1px dashed rgba(0,255,255,0.2); margin-bottom: 15px;">
+    <div style="font-size: 11px; color: #aaa; margin-bottom: 10px; line-height: 1.4;">
+      下方配置默认为 Ollama 本地大模型。如果您购买了第三方的云端中转 API (如 GPT-4o 或 Claude)，请在此覆盖修改。
+    </div>
+    <div class="form-group">
+      <label>文本翻译 API 接口地址:</label>
+      <input type="text" id="api-url" placeholder="http://127.0.0.1:11434/v1/chat/completions" />
+    </div>
+    <div class="form-group">
+      <label>文本翻译 API Keys (一行一个):</label>
+      <textarea id="api-keys" rows="3" placeholder="ollama"></textarea>
+    </div>
+    <div class="form-group">
+      <label>文本翻译 模型名称 (Model Name):</label>
+      <input type="text" id="model-name" placeholder="llama3.1" />
+    </div>
+  </div>
+
+  <button id="save-btn" class="btn primary-btn">保存全部设置</button>
+  <div id="status" class="status-msg"></div>
+
+  <div class="log-section">
+    <div style="display:flex; justify-content: space-between; align-items:center;">
+      <div class="log-title">实时运行日志 (点击刷新)</div>
+      <button id="clear-log-btn" style="background:transparent; border:none; color:#ff5252; cursor:pointer; font-size:12px;">清空</button>
+    </div>
+    <div class="log-content" id="log-content"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

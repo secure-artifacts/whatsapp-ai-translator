@@ -1,0 +1,240 @@
+/* 注入到 WhatsApp 的 UI 样式 - 保持赛博玻璃拟物风 */
+.ai-glass-panel {
+  position: absolute;
+  bottom: 80px; /* 悬浮在输入框上方 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 600px;
+  background: rgba(15, 20, 30, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 16px;
+  padding: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 255, 255, 0.05);
+  z-index: 10000;
+  color: #e0f7fa;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.ai-glass-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #84ffff;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+  padding-bottom: 5px;
+}
+
+.ai-glass-header span.logo {
+  font-weight: bold;
+  background: linear-gradient(to right, #00ffff, #00bfff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ai-glass-close {
+  cursor: pointer;
+  padding: 2px 5px;
+  transition: 0.2s;
+}
+.ai-glass-close:hover { color: #fff; }
+
+.ai-result-box {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.ai-label {
+  font-size: 11px;
+  color: #84ffff;
+  margin-bottom: 4px;
+}
+
+.ai-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ai-btn {
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  color: #00ffff;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ai-btn:hover {
+  background: rgba(0, 255, 255, 0.25);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+}
+
+.ai-btn.fill-btn {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: #00ffff;
+  font-weight: bold;
+}
+
+/* 独立 AI 翻译输入栏 (完美避开与 WhatsApp 原生输入框的冲突) */
+.ai-translator-root {
+  width: 100%;
+  order: 99; /* 在 flex 容器中强制排在最末尾（最下方） */
+  background: #f0f2f5;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  border-top: 1px solid rgba(134, 150, 160, 0.15);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.ai-fake-input {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 15px;
+  color: #111b21;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  box-shadow: 0 1px 3px rgba(11, 20, 26, 0.1);
+  transition: border-color 0.2s;
+}
+
+.ai-fake-input:focus {
+  border-color: #00a884; /* 获焦时显示 WhatsApp 经典绿边框 */
+}
+
+/* 原生态嵌入式面板 (现在嵌在假输入框下方) */
+.ai-inline-panel {
+  width: 100%;
+  padding: 10px 0 0 0;
+  font-family: inherit;
+  margin-top: 5px;
+  animation: fadeIn 0.2s ease-in;
+  cursor: default;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ai-inline-status {
+  font-size: 12px;
+  color: #667781;
+  margin-bottom: 2px;
+}
+
+.ai-inline-text {
+  font-size: 15px;
+  color: #111b21;
+  margin-bottom: 10px;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.ai-inline-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ai-pill-btn {
+  background: #f0f2f5;
+  border: 1px solid rgba(0,0,0,0.05);
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 12px;
+  color: #008069; /* WhatsApp 经典绿 */
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-pill-btn:hover {
+  background: #e9edef;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* 适配深色模式 (Dark Mode) */
+@media (prefers-color-scheme: dark) {
+  .ai-inline-panel { border-top-color: rgba(255, 255, 255, 0.1); }
+  .ai-inline-status { color: #8696a0; }
+  .ai-inline-text { color: #e9edef; }
+  .ai-pill-btn { background: #202c33; color: #00a884; border-color: transparent; }
+  .ai-pill-btn:hover { background: #2a3942; }
+}
+
+/* 语音翻译按钮 */
+.ai-voice-btn {
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(15, 20, 30, 0.8);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  box-shadow: 0 0 10px rgba(0,255,255,0.2);
+}
+.ai-voice-btn:hover {
+  background: rgba(0, 255, 255, 0.2);
+}
+
+/* 迷你启动按钮 (贴在输入框旁边) */
+.ai-trigger-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px;
+  opacity: 0.7;
+  transition: 0.2s;
+}
+.ai-trigger-btn:hover {
+  opacity: 1;
+  text-shadow: 0 0 10px #00ffff;
+}
+
+/* 语音转录字幕框 */
+.ai-voice-result {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(15, 20, 30, 0.85);
+  backdrop-filter: blur(8px);
+  border-left: 3px solid #00ffff;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  line-height: 1.4;
+  word-wrap: break-word;
+}

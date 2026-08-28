@@ -1,0 +1,46 @@
+name: Release Browser Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write
+  contents: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Package extension
+        run: |
+          mkdir -p dist
+          # 复制扩展核心发布文件到 dist 目录
+          cp manifest.json dist/
+          cp background.js dist/
+          cp content.js dist/
+          cp content.css dist/
+          cp inject.js dist/
+          cp popup.html dist/
+          cp popup.css dist/
+          cp popup.js dist/
+          cp guide.html dist/
+          cp icon*.png dist/
+          # 打包为 zip 产物
+          cd dist && zip -r ../whatsapp-ai-translator-${{ github.ref_name }}.zip .
+
+      - name: Attest Build Provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: '*.zip'
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: '*.zip'
+          generate_release_notes: true

@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "WhatsApp AI Translator Pro",
+  "version": "1.0",
+  "description": "WhatsApp 网页版 AI 翻译辅助插件，搭载多密钥轮询与智能 Emoji，赛博玻璃风格 UI。",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://web.whatsapp.com/*"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["inject.js", "icon16.png", "icon32.png", "icon48.png", "icon128.png"],
+      "matches": ["https://web.whatsapp.com/*"]
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AI 翻译设置",
+    "default_icon": {
+      "16": "icon16.png",
+      "32": "icon32.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  }
+}
