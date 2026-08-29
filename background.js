@@ -11,11 +11,16 @@ function addLog(msg, type = 'info') {
 function processLogQueue() {
   if (isLogging || logQueue.length === 0) return;
   isLogging = true;
-  const entry = logQueue.shift();
-  chrome.storage.local.get(['appLogs'], (res) => {
-    let logs = res.appLogs || [];
-    logs.push(entry);
-    if (logs.length > 50) logs = logs.slice(logs.length - 50);
+  
+  const log = logQueue.shift();
+  chrome.storage.local.get(['appLogs'], (result) => {
+    if (chrome.runtime.lastError) {
+      isLogging = false;
+      return;
+    }
+    const logs = result.appLogs || [];
+    logs.push(log);
+    if (logs.length > 50) logs.shift(); 
     chrome.storage.local.set({ appLogs: logs }, () => {
       isLogging = false;
       processLogQueue(); 
@@ -34,7 +39,7 @@ async function fetchWithTimeout(url, options = {}) {
     return response;
   } catch (error) {
     clearTimeout(id);
-    if (error.name === 'AbortError') throw new Error('网络请求超时 (超过8秒无响应)');
+    if (error.name === 'AbortError') throw new Error('网络请求超时 (未能连接到大模型)');
     throw error;
   }
 }
@@ -134,11 +139,11 @@ async function handleAudioTranscription(base64Audio, isOutgoing = false) {
 
 // 文本翻译核心逻辑
 async function handleTranslation(text, forceToChinese) {
-  return new Promise((resolve, reject) => {
-    chrome.storage.local.get(['apiUrl', 'apiKeys', 'modelName', 'targetLang', 'useEmoji', 'customGlossary'], async (settings) => {
-      try {
-        // 彻底修复空数组判断逻辑，确保真正兜底到 Ollama
-        let keys = settings.apiKeys;
+  try {
+    const settings = await chrome.storage.local.get(['apiUrl', 'apiKeys', 'modelName', 'targetLang', 'useEmoji', 'customGlossary']);
+    
+    // 彻底修复空数组判断逻辑，确保真正兜底到 Ollama
+    let keys = settings.apiKeys;
         if (!keys || keys.length === 0 || keys[0].trim() === '') keys = ['ollama'];
         
         let endpoint = settings.apiUrl;
@@ -203,21 +208,19 @@ CRITICAL INSTRUCTIONS:
           const data = await response.json();
           const costTime = Date.now() - startTime;
           addLog(`翻译成功 (耗时 ${costTime}ms)`, 'success');
-          resolve({ provider: modelName, text: data.choices[0].message.content.trim() });
+          return { provider: modelName, text: data.choices[0].message.content.trim() };
         } catch (e) {
           addLog(`主模型报错，强行切到 Google 兜底: ${e.message}`, 'error');
           try {
             const fallbackRes = await fallbackGoogleTranslate(text, finalLang);
-            resolve(fallbackRes);
+            return fallbackRes;
           } catch (fallbackError) {
-            reject(fallbackError); // 【核心修复】必须在这里把 Google 的错误抛出，否则面板会永久卡死在“翻译中”
+            throw fallbackError;
           }
         }
-      } catch (criticalError) {
-        reject(criticalError);
-      }
-    });
-  });
+  } catch (criticalError) {
+    throw criticalError;
+  }
 }
 
 // 免费原生 Google 翻译兜底
