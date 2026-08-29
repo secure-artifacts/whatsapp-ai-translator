@@ -164,6 +164,7 @@ async function handleTranslation(text, forceToChinese) {
         if (glossary.length > 0) {
           const lines = glossary.map(g => `- 当原文中出现词汇/短语 "${g.source}" 时，在译文中必须使用 "${g.target}" 来翻译该词（请将其自然地融入句子中，不要改变原句的其他意思）。`).join('\n');
           glossaryBlock = `\n\n【用户专属词库（词汇映射强制规则）】\n${lines}`;
+          addLog(`已应用 ${glossary.length} 条专属词库规则`, 'info');
         }
         
         let systemPrompt = `You are a highly skilled native ${finalLang} translator chatting on WhatsApp. Your ONLY task is to translate the user's text into ${finalLang}.
