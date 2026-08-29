@@ -371,12 +371,21 @@ function injectAIFooter() {
             translationState.text = text;
             translationState.isOpen = true;
             panel.style.display = 'block';
-            root.querySelector('.ai-status-text').innerText = '翻译中...';
+            const statusEl = root.querySelector('.ai-status-text');
+            statusEl.innerText = '翻译中...';
             root.querySelector('.ai-translation-text').innerText = '';
             root.querySelector('.backtrans-box').style.display = 'none';
 
+            // 智能提示：如果等待太久，可能是本地大模型在冷启动
+            const slowTimer = setTimeout(() => {
+              if (translationState.isOpen && statusEl.innerText === '翻译中...') {
+                statusEl.innerText = '翻译中... (模型加载可能需要较长时间，请耐心等待)';
+              }
+            }, 8000);
+
             // 发起主翻译
             chrome.runtime.sendMessage({ action: 'translate', text: text, isBackTranslation: false }, (res) => {
+              clearTimeout(slowTimer);
               if (res && res.success) {
                 translationState.translated = res.data.text;
                 root.querySelector('.ai-status-text').innerText = '翻译完成 (再次回车直接发送)';
@@ -391,7 +400,7 @@ function injectAIFooter() {
                   }
                 });
               } else {
-                root.querySelector('.ai-status-text').innerText = '翻译失败，请检查日志';
+                root.querySelector('.ai-status-text').innerText = `翻译失败: ${res?.error || '请检查右上方插件的运行日志'}`;
                 translationState.isOpen = false;
               }
             });
