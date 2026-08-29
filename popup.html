@@ -81,6 +81,34 @@
   <button id="save-btn" class="btn primary-btn">保存全部设置</button>
   <div id="status" class="status-msg"></div>
 
+  <!-- ✨ 专属词库管理面板 -->
+  <div style="margin: 18px 0 0 0;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+      <div style="font-size: 13px; font-weight: bold; color: #00a884;">📚 我的专属词库</div>
+      <div style="display:flex; gap:6px;">
+        <button id="add-glossary-btn" style="background:#00a884; color:#fff; border:none; border-radius:14px; padding:3px 10px; font-size:12px; cursor:pointer;">＋ 手动添加</button>
+        <button id="clear-glossary-btn" style="background:transparent; color:#ff5252; border:1px solid #ff5252; border-radius:14px; padding:3px 10px; font-size:12px; cursor:pointer;">清空全部</button>
+      </div>
+    </div>
+
+    <!-- 手动添加表单（默认隐藏） -->
+    <div id="add-glossary-form" style="display:none; background:rgba(0,168,132,0.08); border:1px solid rgba(0,168,132,0.3); border-radius:8px; padding:10px; margin-bottom:10px;">
+      <div style="font-size:11px; color:#888; margin-bottom:5px;">原文关键词 (中文):</div>
+      <input id="new-source" type="text" placeholder="例如: 感谢主" style="width:100%; box-sizing:border-box; padding:5px 8px; border:1px solid #ccc; border-radius:6px; font-size:13px; margin-bottom:6px;">
+      <div style="font-size:11px; color:#888; margin-bottom:5px;">正确译文:</div>
+      <input id="new-target" type="text" placeholder="例如: Graça de Deus" style="width:100%; box-sizing:border-box; padding:5px 8px; border:1px solid #ccc; border-radius:6px; font-size:13px; margin-bottom:8px;">
+      <div style="display:flex; gap:6px;">
+        <button id="confirm-add-glossary" style="flex:1; padding:6px 0; background:linear-gradient(135deg,#00a884,#007a63); color:#fff; border:none; border-radius:16px; font-size:13px; font-weight:bold; cursor:pointer;">保存</button>
+        <button id="cancel-add-glossary" style="flex:0 0 52px; padding:6px 0; background:transparent; color:#888; border:1px solid #ccc; border-radius:16px; font-size:13px; cursor:pointer;">取消</button>
+      </div>
+    </div>
+
+    <!-- 词条列表 -->
+    <div id="glossary-list" style="font-size:13px; color:#ccc;">
+      <div style="color:#666; text-align:center; padding:8px 0;">暂无词条，翻译后点击「✏️ 纠错」添加</div>
+    </div>
+  </div>
+
   <div class="log-section">
     <div style="display:flex; justify-content: space-between; align-items:center;">
       <div class="log-title">实时运行日志 (点击刷新)</div>

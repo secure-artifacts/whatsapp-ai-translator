@@ -408,12 +408,140 @@ function injectAIFooter() {
       }
     });
 
-    // 绑定按钮
+    // 绑定按钮 - 复制
     root.querySelector('.ai-copy-btn').onclick = () => {
       navigator.clipboard.writeText(translationState.translated);
-      root.querySelector('.ai-copy-btn').innerText = '已复制';
+      root.querySelector('.ai-copy-btn').innerText = '已复制✓';
+      setTimeout(() => { root.querySelector('.ai-copy-btn').innerText = '复制翻译'; }, 1500);
+    };
+
+    // 绑定按钮 - ✏️ 纠错 & 保存到词库
+    root.querySelector('.ai-save-btn').onclick = () => {
+      showCorrectionUI(root, translationState);
     };
   }
+}
+
+// ============================================================
+//  ✨ 纠错 & 记忆词库：弹出内联纠错界面
+// ============================================================
+function showCorrectionUI(root, state) {
+  // 如果已经有纠错框，不重复弹出
+  if (root.querySelector('#ai-correction-box')) return;
+
+  const translationTextEl = root.querySelector('.ai-translation-text');
+  const currentTranslation = state.translated || translationTextEl.innerText.replace(/^📝\s*/, '');
+  const sourceText = state.text || '';
+
+  const box = document.createElement('div');
+  box.id = 'ai-correction-box';
+  box.style.cssText = `
+    margin-top: 8px; padding: 10px 12px;
+    background: rgba(255, 235, 59, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.5);
+    border-radius: 10px;
+    animation: ai-fade-in 0.2s ease;
+  `;
+  box.innerHTML = `
+    <div style="font-size: 12px; color: #888; margin-bottom: 6px;">
+      ✏️ <b style="color:#e6a817;">纠错模式</b> — 请在下方修改为正确的表达：
+    </div>
+    <div style="font-size: 11px; color: #666; margin-bottom: 5px;">
+      原文提示: <span style="color:#00a884; font-weight:bold;">${sourceText.length > 40 ? sourceText.slice(0,40)+'…' : sourceText || '（自动从翻译中提取）'}</span>
+    </div>
+    <input id="ai-correction-input" type="text" value="${currentTranslation.replace(/"/g, '&quot;')}"
+      style="width:100%; box-sizing:border-box; padding: 7px 10px;
+             border: 1.5px solid #00a884; border-radius: 7px;
+             font-size: 14px; color: #111b21; background: #fff;
+             outline: none; margin-bottom: 7px;" />
+    <div style="font-size: 11px; color: #888; margin-bottom: 7px;">
+      🔑 关键词 (AI 会在遇到此词时使用你的纠正):
+    </div>
+    <input id="ai-source-input" type="text" placeholder="输入原文关键词，例如: 感谢主"
+      value="${sourceText.length > 0 && sourceText.length <= 20 ? sourceText : ''}"
+      style="width:100%; box-sizing:border-box; padding: 6px 10px;
+             border: 1.5px solid #ccc; border-radius: 7px;
+             font-size: 13px; color: #111b21; background: #fff;
+             outline: none; margin-bottom: 9px;" />
+    <div style="display:flex; gap:7px;">
+      <button id="ai-confirm-correction" style="
+        flex:1; padding: 7px 0; border:none; border-radius: 20px;
+        background: linear-gradient(135deg, #00a884, #007a63);
+        color:#fff; font-size: 13px; font-weight: bold; cursor:pointer;
+        box-shadow: 0 2px 8px rgba(0,168,132,0.35);
+      ">💾 记住这个表达</button>
+      <button id="ai-cancel-correction" style="
+        flex:0 0 60px; padding: 7px 0; border:1px solid #ccc; border-radius: 20px;
+        background: transparent; color: #888; font-size: 13px; cursor:pointer;
+      ">取消</button>
+    </div>
+  `;
+
+  // 注入淡入动画
+  if (!document.getElementById('ai-fade-style')) {
+    const s = document.createElement('style');
+    s.id = 'ai-fade-style';
+    s.textContent = `@keyframes ai-fade-in { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }`;
+    document.head.appendChild(s);
+  }
+
+  // 把纠错框插在操作按钮行之前
+  const actionsEl = root.querySelector('.ai-inline-actions');
+  actionsEl.parentNode.insertBefore(box, actionsEl);
+
+  // 自动聚焦纠错输入框，选中全部
+  setTimeout(() => {
+    const inp = box.querySelector('#ai-correction-input');
+    inp.focus();
+    inp.select();
+  }, 50);
+
+  // 取消
+  box.querySelector('#ai-cancel-correction').onclick = () => box.remove();
+
+  // 确认保存
+  box.querySelector('#ai-confirm-correction').onclick = () => {
+    const correctedTarget = box.querySelector('#ai-correction-input').value.trim();
+    const sourceKeyword = box.querySelector('#ai-source-input').value.trim();
+
+    if (!correctedTarget) {
+      box.querySelector('#ai-correction-input').style.borderColor = '#ff5252';
+      return;
+    }
+    if (!sourceKeyword) {
+      box.querySelector('#ai-source-input').style.borderColor = '#ff5252';
+      box.querySelector('#ai-source-input').placeholder = '⚠️ 请填写关键词！';
+      return;
+    }
+
+    chrome.storage.local.get(['customGlossary'], (res) => {
+      const glossary = res.customGlossary || [];
+
+      // 检查是否已有相同原文关键词 → 更新而非重复
+      const existingIdx = glossary.findIndex(g => g.source === sourceKeyword);
+      const entry = { source: sourceKeyword, target: correctedTarget, addedAt: Date.now() };
+      if (existingIdx >= 0) {
+        glossary[existingIdx] = entry; // 覆盖更新
+      } else {
+        glossary.push(entry);
+      }
+
+      chrome.storage.local.set({ customGlossary: glossary }, () => {
+        // 更新 UI 翻译文本
+        state.translated = correctedTarget;
+        root.querySelector('.ai-translation-text').innerText = `📝 ${correctedTarget}`;
+
+        // 替换纠错框为成功提示
+        box.style.background = 'rgba(0, 168, 132, 0.1)';
+        box.style.borderColor = 'rgba(0, 168, 132, 0.5)';
+        box.innerHTML = `
+          <div style="text-align:center; padding: 6px 0; color: #00a884; font-size: 13px; font-weight: bold;">
+            ✅ 已记住！以后遇到 "<b>${sourceKeyword}</b>" 将自动译为 "<b>${correctedTarget}</b>"
+          </div>`;
+        setTimeout(() => box.remove(), 3000);
+      });
+    });
+  };
 }
 
 // 终极发送方案：直接把翻译好的外文扔进完全空白的 WhatsApp 原生输入框，然后点击发送
