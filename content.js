@@ -211,7 +211,7 @@ function injectAIFooter() {
         
         <div class="ai-inline-actions">
           <button class="ai-pill-btn ai-copy-btn">复制翻译</button>
-          <button class="ai-pill-btn ai-save-btn">保存到词库</button>
+          <button class="ai-pill-btn ai-save-btn">✏️ 纠错</button>
         </div>
       </div>
     `;
@@ -469,7 +469,7 @@ function showCorrectionUI(root, state) {
         background: linear-gradient(135deg, #00a884, #007a63);
         color:#fff; font-size: 13px; font-weight: bold; cursor:pointer;
         box-shadow: 0 2px 8px rgba(0,168,132,0.35);
-      ">💾 记住这个表达</button>
+      ">💾 保存到词库</button>
       <button id="ai-cancel-correction" style="
         flex:0 0 60px; padding: 7px 0; border:1px solid #ccc; border-radius: 20px;
         background: transparent; color: #888; font-size: 13px; cursor:pointer;
