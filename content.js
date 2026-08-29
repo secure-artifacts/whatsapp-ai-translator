@@ -453,24 +453,25 @@ function showCorrectionUI(root, state) {
   `;
   box.innerHTML = `
     <div style="font-size: 12px; color: #888; margin-bottom: 6px;">
-      ✏️ <b style="color:#e6a817;">纠错模式</b> — 请在下方修改为正确的表达：
+      ✏️ <b style="color:#e6a817;">词汇纠错模式</b> — 请提取关键词并修正它的译文：
     </div>
     <div style="font-size: 11px; color: #666; margin-bottom: 5px;">
-      原文提示: <span style="color:#00a884; font-weight:bold;">${sourceText.length > 40 ? sourceText.slice(0,40)+'…' : sourceText || '（自动从翻译中提取）'}</span>
+      原文句子: <span style="color:#00a884;">${sourceText.length > 40 ? sourceText.slice(0,40)+'…' : sourceText || '（无原文）'}</span>
     </div>
-    <input id="ai-correction-input" type="text" value="${currentTranslation.replace(/"/g, '&quot;')}"
-      style="width:100%; box-sizing:border-box; padding: 7px 10px;
-             border: 1.5px solid #00a884; border-radius: 7px;
-             font-size: 14px; color: #111b21; background: #fff;
-             outline: none; margin-bottom: 7px;" />
-    <div style="font-size: 11px; color: #888; margin-bottom: 7px;">
-      🔑 关键词 (AI 会在遇到此词时使用你的纠正):
+    <div style="font-size: 11px; color: #e6a817; margin-bottom: 5px; font-weight:bold;">
+      ⚠️ 注意：下面两栏请只填【单个词汇或短语】，不要填整句！
     </div>
-    <input id="ai-source-input" type="text" placeholder="输入原文关键词，例如: 感谢主"
-      value="${sourceText.length > 0 && sourceText.length <= 20 ? sourceText : ''}"
+    <input id="ai-source-input" type="text" placeholder="输入原文中的某个关键词，例如: 弟兄"
+      value="${sourceText.length > 0 && sourceText.length <= 15 ? sourceText : ''}"
       style="width:100%; box-sizing:border-box; padding: 6px 10px;
              border: 1.5px solid #ccc; border-radius: 7px;
              font-size: 13px; color: #111b21; background: #fff;
+             outline: none; margin-bottom: 7px;" />
+    <input id="ai-correction-input" type="text" placeholder="输入该关键词的正确译文，例如: irmão"
+      value="${currentTranslation.length <= 15 ? currentTranslation.replace(/"/g, '&quot;') : ''}"
+      style="width:100%; box-sizing:border-box; padding: 7px 10px;
+             border: 1.5px solid #00a884; border-radius: 7px;
+             font-size: 14px; color: #111b21; background: #fff;
              outline: none; margin-bottom: 9px;" />
     <div style="display:flex; gap:7px;">
       <button id="ai-confirm-correction" style="
@@ -536,18 +537,15 @@ function showCorrectionUI(root, state) {
       }
 
       chrome.storage.local.set({ customGlossary: glossary }, () => {
-        // 更新 UI 翻译文本
-        state.translated = correctedTarget;
-        root.querySelector('.ai-translation-text').innerText = `📝 ${correctedTarget}`;
-
         // 替换纠错框为成功提示
         box.style.background = 'rgba(0, 168, 132, 0.1)';
         box.style.borderColor = 'rgba(0, 168, 132, 0.5)';
         box.innerHTML = `
           <div style="text-align:center; padding: 6px 0; color: #00a884; font-size: 13px; font-weight: bold;">
-            ✅ 已记住！以后遇到 "<b>${sourceKeyword}</b>" 将自动译为 "<b>${correctedTarget}</b>"
+            ✅ 已记住！遇到 "${sourceKeyword}" 会译为 "${correctedTarget}"<br>
+            <span style="font-size:11px; color:#666;">（你可以关闭当前翻译，重新按回车翻译一次以应用新词库）</span>
           </div>`;
-        setTimeout(() => box.remove(), 3000);
+        setTimeout(() => box.remove(), 4000);
       });
     });
   };

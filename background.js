@@ -162,8 +162,8 @@ async function handleTranslation(text, forceToChinese) {
         // ✨ 构建用户专属词库约束块（如有词条则插在最高优先级）
         let glossaryBlock = '';
         if (glossary.length > 0) {
-          const lines = glossary.map(g => `- 遇到含有 "${g.source}" 的原文，必须译为: "${g.target}"（严禁使用其他表达）`).join('\n');
-          glossaryBlock = `\n\n【用户专属词库（最高优先级，必须严格遵守，不得违反）】\n${lines}`;
+          const lines = glossary.map(g => `- 当原文中出现词汇/短语 "${g.source}" 时，在译文中必须使用 "${g.target}" 来翻译该词（请将其自然地融入句子中，不要改变原句的其他意思）。`).join('\n');
+          glossaryBlock = `\n\n【用户专属词库（词汇映射强制规则）】\n${lines}`;
         }
         
         let systemPrompt = `You are a highly skilled native ${finalLang} translator chatting on WhatsApp. Your ONLY task is to translate the user's text into ${finalLang}.
