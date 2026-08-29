@@ -100,14 +100,28 @@ document.addEventListener('DOMContentLoaded', () => {
                   padding: 7px 10px; margin-bottom:5px;
                   background: rgba(255,255,255,0.05); border-radius:8px;
                   border-left: 3px solid #00a884;">
-        <div style="flex:1; min-width:0;">
+        <!-- 浏览模式 -->
+        <div style="flex:1; min-width:0;" id="glossary-view-${i}">
           <span style="color:#00a884; font-weight:bold;">${escHtml(g.source)}</span>
           <span style="color:#667781; margin: 0 5px;">→</span>
           <span style="color:#e0e0e0;">${escHtml(g.target)}</span>
         </div>
-        <button data-idx="${i}" class="del-glossary-btn"
-          style="flex-shrink:0; margin-left:8px; background:transparent; border:none;
-                 color:#ff5252; font-size:16px; cursor:pointer; line-height:1;" title="删除">✕</button>
+        <!-- 编辑模式 -->
+        <div style="flex:1; min-width:0; display:none; gap:4px; margin-right:6px;" id="glossary-edit-box-${i}">
+          <input type="text" id="edit-src-${i}" value="${escHtml(g.source)}" style="width:40%; padding:3px 5px; font-size:12px; border:1px solid #00a884; border-radius:4px; outline:none;">
+          <input type="text" id="edit-tgt-${i}" value="${escHtml(g.target)}" style="width:60%; padding:3px 5px; font-size:12px; border:1px solid #00a884; border-radius:4px; outline:none;">
+        </div>
+        
+        <!-- 浏览模式按钮 -->
+        <div style="flex-shrink:0; display:flex; gap:10px;" id="glossary-actions-view-${i}">
+          <button data-idx="${i}" class="edit-glossary-btn" style="background:transparent; border:none; color:#00a884; font-size:14px; cursor:pointer; padding:0;" title="编辑">✏️</button>
+          <button data-idx="${i}" class="del-glossary-btn" style="background:transparent; border:none; color:#ff5252; font-size:15px; cursor:pointer; padding:0; line-height:1;" title="删除">✕</button>
+        </div>
+        <!-- 编辑模式按钮 -->
+        <div style="flex-shrink:0; display:none; gap:6px;" id="glossary-actions-edit-${i}">
+          <button data-idx="${i}" class="save-edit-btn" style="background:#00a884; border:none; color:#fff; border-radius:4px; padding:3px 8px; font-size:12px; cursor:pointer; font-weight:bold;">保存</button>
+          <button data-idx="${i}" class="cancel-edit-btn" style="background:transparent; border:1px solid #888; color:#aaa; border-radius:4px; padding:3px 8px; font-size:12px; cursor:pointer;">取消</button>
+        </div>
       </div>
     `).join('');
 
@@ -119,6 +133,52 @@ document.addEventListener('DOMContentLoaded', () => {
           const arr = res.customGlossary || [];
           arr.splice(idx, 1);
           chrome.storage.local.set({ customGlossary: arr }, () => renderGlossary(arr));
+        });
+      });
+    });
+
+    // 绑定编辑按钮 (进入编辑状态)
+    glossaryList.querySelectorAll('.edit-glossary-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx, 10);
+        document.getElementById(`glossary-view-${idx}`).style.display = 'none';
+        document.getElementById(`glossary-actions-view-${idx}`).style.display = 'none';
+        document.getElementById(`glossary-edit-box-${idx}`).style.display = 'flex';
+        document.getElementById(`glossary-actions-edit-${idx}`).style.display = 'flex';
+      });
+    });
+
+    // 绑定取消编辑按钮
+    glossaryList.querySelectorAll('.cancel-edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx, 10);
+        document.getElementById(`glossary-view-${idx}`).style.display = 'block';
+        document.getElementById(`glossary-actions-view-${idx}`).style.display = 'flex';
+        document.getElementById(`glossary-edit-box-${idx}`).style.display = 'none';
+        document.getElementById(`glossary-actions-edit-${idx}`).style.display = 'none';
+      });
+    });
+
+    // 绑定保存编辑按钮
+    glossaryList.querySelectorAll('.save-edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx, 10);
+        const newSrc = document.getElementById(`edit-src-${idx}`).value.trim();
+        const newTgt = document.getElementById(`edit-tgt-${idx}`).value.trim();
+        
+        if (!newSrc || !newTgt) {
+          if (!newSrc) document.getElementById(`edit-src-${idx}`).style.borderColor = '#ff5252';
+          if (!newTgt) document.getElementById(`edit-tgt-${idx}`).style.borderColor = '#ff5252';
+          return;
+        }
+
+        chrome.storage.local.get(['customGlossary'], (res) => {
+          const arr = res.customGlossary || [];
+          if (arr[idx]) {
+            arr[idx].source = newSrc;
+            arr[idx].target = newTgt;
+            chrome.storage.local.set({ customGlossary: arr }, () => renderGlossary(arr));
+          }
         });
       });
     });
