@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "WhatsApp AI Translator Pro",
-  "version": "1.0",
+  "version": "1.1.0",
   "description": "WhatsApp 网页版 AI 翻译辅助插件，搭载多密钥轮询与智能 Emoji，赛博玻璃风格 UI。",
   "permissions": [
     "storage"
